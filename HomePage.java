@@ -1,7 +1,7 @@
 package QuizApp;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class HomePage extends JFrame {
     private JTextField nameField;
@@ -22,13 +22,17 @@ public class HomePage extends JFrame {
 
         startButton = new JButton("Start Quiz");
         startButton.addActionListener(e -> {
-            String name = nameField.getText().trim();
-            if (name.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please enter your name to start.");
-            } else {
-                Quiz quiz = new Quiz(name);
-                quiz.setVisible(true);
-                this.dispose();
+            try {
+                String name = nameField.getText().trim();
+                if (name.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Please enter your name to start.");
+                } else {
+                    Quiz quiz = new Quiz(name);
+                    quiz.setVisible(true);
+                    this.dispose();
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "An error occurred while starting the quiz: " + ex.getMessage());
             }
         });
 

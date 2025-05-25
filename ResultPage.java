@@ -3,6 +3,9 @@ package QuizApp;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Displays quiz result summary to the user.
+ */
 public class ResultPage extends JFrame {
     public ResultPage(String userName, int score, int totalQuestions) {
         setTitle("Quiz Master - Result");
@@ -27,4 +30,3 @@ public class ResultPage extends JFrame {
         add(exitButton);
     }
 }
-

@@ -1,10 +1,11 @@
-// Quiz.java
-
 package QuizApp;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
+/**
+ * Main quiz interface to show questions and collect answers.
+ */
 public class Quiz extends JFrame {
     private QuestionBank questionBank;
     private int currentIndex = 0;
@@ -40,19 +41,23 @@ public class Quiz extends JFrame {
 
         nextButton = new JButton("Next");
         nextButton.addActionListener(e -> {
-            if (isOptionSelected()) {
-                checkAnswer();
-                currentIndex++;
-                if (currentIndex < questionBank.getSize()) {
-                    loadQuestion(currentIndex);
+            try {
+                if (isOptionSelected()) {
+                    checkAnswer();
+                    currentIndex++;
+                    if (currentIndex < questionBank.getSize()) {
+                        loadQuestion(currentIndex);
+                    } else {
+                        // Quiz finished - show results
+                        ResultPage resultPage = new ResultPage(userName, score, questionBank.getSize());
+                        resultPage.setVisible(true);
+                        this.dispose();
+                    }
                 } else {
-                    // Quiz finished
-                    ResultPage resultPage = new ResultPage(userName, score, questionBank.getSize());
-                    resultPage.setVisible(true);
-                    this.dispose();
+                    JOptionPane.showMessageDialog(this, "Please select an option before proceeding.");
                 }
-            } else {
-                JOptionPane.showMessageDialog(this, "Please select an option before proceeding.");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "An error occurred during the quiz: " + ex.getMessage());
             }
         });
 
@@ -67,16 +72,32 @@ public class Quiz extends JFrame {
         loadQuestion(currentIndex);
     }
 
+    /**
+     * Loads question at given index to the UI.
+     * @param index question index
+     */
     private void loadQuestion(int index) {
-        Question q = questionBank.getQuestion(index);
-        questionLabel.setText("Q" + (index + 1) + ": " + q.getQuestion());
-        String[] options = q.getOptions();
-        for (int i = 0; i < options.length; i++) {
-            optionButtons[i].setText(options[i]);
+        try {
+            Question q = questionBank.getQuestion(index);
+            if (q != null) {
+                questionLabel.setText("Q" + (index + 1) + ": " + q.getQuestion());
+                String[] options = q.getOptions();
+                for (int i = 0; i < options.length; i++) {
+                    optionButtons[i].setText(options[i]);
+                }
+                buttonGroup.clearSelection();
+            } else {
+                throw new IndexOutOfBoundsException("Question not found at index: " + index);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(this, "Error loading question: " + e.getMessage());
         }
-        buttonGroup.clearSelection();
     }
 
+    /**
+     * Checks if any option is selected.
+     * @return true if selected
+     */
     private boolean isOptionSelected() {
         for (JRadioButton btn : optionButtons) {
             if (btn.isSelected()) return true;
@@ -84,12 +105,17 @@ public class Quiz extends JFrame {
         return false;
     }
 
+    /**
+     * Checks selected answer against correct answer.
+     */
     private void checkAnswer() {
         Question q = questionBank.getQuestion(currentIndex);
-        for (int i = 0; i < optionButtons.length; i++) {
-            if (optionButtons[i].isSelected()) {
-                if (i == q.getCorrectAnswerIndex()) {
-                    score++;
+        if (q != null) {
+            for (int i = 0; i < optionButtons.length; i++) {
+                if (optionButtons[i].isSelected()) {
+                    if (i == q.getCorrectAnswerIndex()) {
+                        score++;
+                    }
                 }
             }
         }
